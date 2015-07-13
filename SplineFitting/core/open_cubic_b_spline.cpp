@@ -1,4 +1,4 @@
-#include "cubic_b_spline.h"
+#include "open_cubic_b_spline.h"
 #include <fstream>
 
 #include <ANN/ANN.h>
@@ -6,12 +6,13 @@
 
 
 
-void ClosedCubicBSplineCurve::setNewControl( const vector<Vector2d>& controlPs)
+void OpenCubicBSplineCurve::setNewControl( const vector<Vector2d>& controlPs)
 {
 	clear();
 	controls_ = controlPs;
+	int numSeg = nb_segment();
 
-	for( unsigned int i = 0; i<nb_control(); i++)
+	for( unsigned int i = 0; i<numSeg; i++)
 	{
 		for( double fj = 0; fj <=1.0f; fj+= interal_)
 		{
@@ -30,7 +31,7 @@ void ClosedCubicBSplineCurve::setNewControl( const vector<Vector2d>& controlPs)
 // Time:      2014/08/05
 // Author:    Qian
 //************************************
-Vector2d ClosedCubicBSplineCurve::getPos( const Parameter& para) const
+Vector2d OpenCubicBSplineCurve::getPos( const Parameter& para) const
 {
 	MatrixXd cm(4,4);
 	cm << -1, 3, -3, 1,
@@ -49,15 +50,15 @@ Vector2d ClosedCubicBSplineCurve::getPos( const Parameter& para) const
 	MatrixXd pm(4,2);
 	for( int i = 0; i < 4; i++)
 	{
-		pm(i,0) = controls_[(ki+i)%n].x()/6.0;
-		pm(i,1) = controls_[(ki+i)%n].y()/6.0;
+		pm(i,0) = controls_[(ki+i)].x()/6.0;
+		pm(i,1) = controls_[(ki+i)].y()/6.0;
 	}
 	MatrixXd rm = tm*cm*pm;
 
 	return Vector2d( rm(0,0), rm(0,1));
 }
 
-Vector2d ClosedCubicBSplineCurve::getFirstDiff(const Parameter& para) const
+Vector2d OpenCubicBSplineCurve::getFirstDiff(const Parameter& para) const
 {
 	MatrixXd cm(4,4);
 	cm << -1, 3, -3, 1,
@@ -75,8 +76,8 @@ Vector2d ClosedCubicBSplineCurve::getFirstDiff(const Parameter& para) const
 	MatrixXd pm(4,2);
 	for( int i = 0; i < 4; i++)
 	{
-		pm(i,0) =  controls_[(ki+i)%n].x()/ 6.0f;
-		pm(i,1) =  controls_[(ki+i)%n].y() / 6.0f;
+		pm(i,0) =  controls_[(ki+i)].x()/ 6.0f;
+		pm(i,1) =  controls_[(ki+i)].y() / 6.0f;
 	}
 
 
@@ -87,7 +88,7 @@ Vector2d ClosedCubicBSplineCurve::getFirstDiff(const Parameter& para) const
 }
 
 
-Vector2d ClosedCubicBSplineCurve::getSecondDiff( const Parameter& para ) const
+Vector2d OpenCubicBSplineCurve::getSecondDiff( const Parameter& para ) const
 {
 	MatrixXd cm(4,4);
 	cm << -1, 3, -3, 1,
@@ -105,8 +106,8 @@ Vector2d ClosedCubicBSplineCurve::getSecondDiff( const Parameter& para ) const
 	MatrixXd pm(4,2);
 	for( int i = 0; i < 4; i++)
 	{
-		pm(i,0) = controls_[(ki+i)%n].x()/6.0;
-		pm(i,1) =  controls_[(ki+i)%n].y()/6.0;
+		pm(i,0) = controls_[(ki+i)].x()/6.0;
+		pm(i,1) =  controls_[(ki+i)].y()/6.0;
 	}
 	MatrixXd rm = tm*cm*pm;
 
@@ -116,7 +117,7 @@ Vector2d ClosedCubicBSplineCurve::getSecondDiff( const Parameter& para ) const
 
 
 // Refer: http://en.wikipedia.org/wiki/Curvature
-double  ClosedCubicBSplineCurve::getCurvature(const Parameter& para)  const
+double  OpenCubicBSplineCurve::getCurvature(const Parameter& para)  const
 {
 	Vector2d fp = getFirstDiff( para );
 	Vector2d sp = getSecondDiff( para );
@@ -129,14 +130,14 @@ double  ClosedCubicBSplineCurve::getCurvature(const Parameter& para)  const
 
 
 
-Vector2d ClosedCubicBSplineCurve::getTangent( const Parameter &para ) const
+Vector2d OpenCubicBSplineCurve::getTangent( const Parameter &para ) const
 {
 	Vector2d p = getFirstDiff(para);
 	return p.normalized();
 
 }
 
-Vector2d ClosedCubicBSplineCurve::getNormal( const Parameter &para ) const
+Vector2d OpenCubicBSplineCurve::getNormal( const Parameter &para ) const
 {
 	Vector2d v = getTangent( para );
 	return Vector2d( -v.y(), v.x() );
@@ -144,7 +145,7 @@ Vector2d ClosedCubicBSplineCurve::getNormal( const Parameter &para ) const
 }
 
 
-Vector2d ClosedCubicBSplineCurve::getCurvCenter( const Parameter &para) const
+Vector2d OpenCubicBSplineCurve::getCurvCenter( const Parameter &para) const
 {
 	Vector2d p = getPos(para);
 
@@ -164,7 +165,7 @@ Vector2d ClosedCubicBSplineCurve::getCurvCenter( const Parameter &para) const
 }
 
 
-double ClosedCubicBSplineCurve::findFootPrint(const vector<Vector2d>& givepoints, 
+double OpenCubicBSplineCurve::findFootPrint(const vector<Vector2d>& givepoints, 
 									   vector<Parameter>& footPrints) const
 {
 	footPrints.clear();
@@ -213,9 +214,9 @@ double ClosedCubicBSplineCurve::findFootPrint(const vector<Vector2d>& givepoints
 }
 
 
-ClosedCubicBSplineCurve::Parameter ClosedCubicBSplineCurve::getPara( int index ) const
+OpenCubicBSplineCurve::Parameter OpenCubicBSplineCurve::getPara( int index ) const
 {
-	int num = (int)( positions_.size()/controls_.size());
+	int num = (int)( positions_.size()/ nb_segment() );
 	int ki = index/num;
 	double tf = interal_*( index - ki*num );
 	return make_pair( ki, tf);
@@ -223,7 +224,7 @@ ClosedCubicBSplineCurve::Parameter ClosedCubicBSplineCurve::getPara( int index )
 
 
 
-VectorXd ClosedCubicBSplineCurve::getCoffe( const Parameter& para) const
+VectorXd OpenCubicBSplineCurve::getCoffe( const Parameter& para) const
 {
 	int ki = para.first;
 	double tf = para.second;
@@ -243,14 +244,14 @@ VectorXd ClosedCubicBSplineCurve::getCoffe( const Parameter& para) const
 	newv.setZero();
 	for( int i = 0; i < 4; i++)
 	{
-		newv[ (ki+i)%nb_control() ] = rv(0,i)/6.0f;
+		newv[ (ki+i)] = rv(0,i)/6.0f;
 	}
 	return newv;
 }
 
 
 //temporary solution 
-bool ClosedCubicBSplineCurve::checkSameSide(Vector2d p1, Vector2d p2 , Vector2d neip)
+bool OpenCubicBSplineCurve::checkSameSide(Vector2d p1, Vector2d p2 , Vector2d neip)
 {
 	Vector2d v1 = p2 - neip;
 	Vector2d v2 = p1 - neip;
@@ -266,7 +267,7 @@ bool ClosedCubicBSplineCurve::checkSameSide(Vector2d p1, Vector2d p2 , Vector2d 
 
 
 
-bool ClosedCubicBSplineCurve::checkInside(Vector2d p)
+bool OpenCubicBSplineCurve::checkInside(Vector2d p)
 {
 	int strip = 0.02/interal_;
 	int    wn = 0;    // the winding number counter
@@ -294,7 +295,7 @@ bool ClosedCubicBSplineCurve::checkInside(Vector2d p)
 
 }
 
-int ClosedCubicBSplineCurve::isLeft( Vector2d p0, Vector2d p1, Vector2d p2)
+int OpenCubicBSplineCurve::isLeft( Vector2d p0, Vector2d p1, Vector2d p2)
 {
 	return ( (p1.x() - p0.x()) * (p2.y() - p0.y())
 		- (p2.x() - p0.x()) * (p1.y() - p0.y()) );
@@ -302,7 +303,7 @@ int ClosedCubicBSplineCurve::isLeft( Vector2d p0, Vector2d p1, Vector2d p2)
 
 
 
-MatrixXd ClosedCubicBSplineCurve::getSIntegralSq()
+MatrixXd OpenCubicBSplineCurve::getSIntegralSq()
 {
 	// compute P"(t)
 	int controlNum  = nb_control();
@@ -322,16 +323,17 @@ MatrixXd ClosedCubicBSplineCurve::getSIntegralSq()
 
 
 	Matrix4d coffm = cm.transpose()*tm.transpose()*tIntergrated*tm*cm; 
-	for( int i = 0; i < controlNum; i++)
+	unsigned int segNum = nb_segment();
+	for( int i = 0; i < segNum; i++)
 	{
 		for( int j = 0; j < 4; j++)
 		{
 			for( int n = 0; n < 4; n++)
 			{
-				int kj = ( i+j ) % controlNum;
-				int kn = (i+n) % controlNum;
-				pm(kj,kn) += coffm(j,n);
-				pm(controlNum+kj,controlNum+kn) += coffm(j,n);
+				int kj = (i+j);
+				int kn = (i+n);
+				pm(kj,kn) += 2*coffm(j,n);
+				pm(controlNum+kj,controlNum+kn) += 2*coffm(j,n);
 			}
 		}
 	}
@@ -339,7 +341,7 @@ MatrixXd ClosedCubicBSplineCurve::getSIntegralSq()
 }
 
 
-MatrixXd ClosedCubicBSplineCurve::getFIntegralSq()
+MatrixXd OpenCubicBSplineCurve::getFIntegralSq()
 {
 	// compute P"(t)
 	int controlNum  = nb_control();
@@ -362,16 +364,17 @@ MatrixXd ClosedCubicBSplineCurve::getFIntegralSq()
 	tm << 3, 0, 0, 0,2, 0, 0, 0,1;
 
 	Matrix4d coffm = cm.transpose()*tm.transpose()*tIntergrated*tm*cm; 
-	for( int i = 0; i < controlNum; i++)
+	int segNum = nb_segment();
+	for( int i = 0; i < segNum; i++)
 	{
 		for( int j = 0; j < 4; j++)
 		{
 			for( int n = 0; n < 4; n++)
 			{
-				int kj = ( i+j ) % controlNum;
-				int kn = (i+n) % controlNum;
-				pm(kj,kn) += coffm(j,n);
-				pm(controlNum+kj,controlNum+kn) += coffm(j,n);
+				int kj = ( i+j );
+				int kn = (i+n);
+				pm(kj,kn) += 2*coffm(j,n);
+				pm(controlNum+kj,controlNum+kn) += 2*coffm(j,n);
 			}
 		}
 	}
@@ -379,10 +382,8 @@ MatrixXd ClosedCubicBSplineCurve::getFIntegralSq()
 
 }
 
-void ClosedCubicBSplineCurve::getDistance_sd( const Vector2d& point, const Parameter& para, MatrixXd& ehm, VectorXd& ehv )
+void OpenCubicBSplineCurve::getDistance_sd( const Vector2d& point, const Parameter& para, MatrixXd& ehm, VectorXd& ehv )
 {
-	int controlNum = nb_control();
-
 	int ki = para.first;
 	double tf = para.second;
 
@@ -429,6 +430,26 @@ void ClosedCubicBSplineCurve::getDistance_sd( const Vector2d& point, const Param
 		rightv += d/(d-rho)*tmpv;
 	} 
 
+	Vector2d oldp = point - neip;
+	bool isOuter = false;
+	double endpoints_thresh = 1e-2;
+	if( ki == 0 && tf <= endpoints_thresh && Tkv.dot( oldp) < 0) 
+	{ 
+		isOuter = true;
+	}
+	if( ki == nb_segment()-1 && tf > 1 - endpoints_thresh &&  Tkv.dot(oldp) >0 )
+	{
+		isOuter = true;
+	}
+	if( isOuter )
+	{
+		MatrixXd leftm_pd = 2*am.transpose()*am;  //8*8
+		VectorXd rightv_pd= 2*am.transpose()*point;  //8*1
+		double cos_theta = std::abs( oldp.dot(Tkv)/oldp.norm() );
+		leftm = cos_theta*leftm_pd + (1-cos_theta)*leftm;
+		rightv = cos_theta*rightv_pd + (1-cos_theta)*rightv;
+	}
+
 	// 写入整个大矩阵中
 	for( int iRow = 0 ;iRow!=8; ++iRow )
 	{
@@ -442,21 +463,52 @@ void ClosedCubicBSplineCurve::getDistance_sd( const Vector2d& point, const Param
 	}
 }
 
-int ClosedCubicBSplineCurve::local2GlobalIdx( int segId, int localIdx )
+int OpenCubicBSplineCurve::local2GlobalIdx( int segId, int localIdx )
 {
-	
 	int globalIdx = 0;
-
 	if( localIdx < 4)
 	{
 		globalIdx = segId+localIdx;
-		globalIdx = globalIdx%nb_control();
 	}
 	else
 	{
-		globalIdx =segId+(localIdx-4); 
-		globalIdx = globalIdx%nb_control();
-		globalIdx += nb_control();
+		globalIdx = nb_control()+segId+(localIdx-4);
 	}
 	return globalIdx;
+}
+
+void OpenCubicBSplineCurve::getDistance_pd( const Vector2d& point, const Parameter& para, MatrixXd& ehm, VectorXd& ehv )
+{
+	int ki = para.first;
+	double tf = para.second;
+
+	Matrix4d cm(4,4);
+	cm << -1, 3, -3, 1,
+		3, -6, 3, 0,
+		-3, 0, 3, 0,
+		1, 4, 1, 0;
+
+	MatrixXd  tv(1,4);
+	tv << tf*tf*tf, tf*tf, tf, 1;
+	MatrixXd rv = tv*cm/6.0;   //1*4
+
+	MatrixXd am(2,8);
+	am.setZero();
+	am.block(0,0,1,4) = rv.block(0,0,1,4);
+	am.block(1,4,1,4) = rv.block(0,0,1,4);
+
+	MatrixXd leftm = 2*am.transpose()*am;  //8*8
+	VectorXd rightv= 2*am.transpose()*point;  //8*1
+
+	// 写入整个大矩阵中
+	for( int iRow = 0 ;iRow!=8; ++iRow )
+	{
+		int iRowG = local2GlobalIdx(ki,iRow);
+		for( int jCol = 0; jCol != 8; ++jCol)
+		{
+			int jColG = local2GlobalIdx(ki,jCol);
+			ehm(iRowG,jColG) += leftm(iRow,jCol);
+		}
+		ehv(iRowG) += rightv(iRow);
+	}
 }

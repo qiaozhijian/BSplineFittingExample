@@ -1,5 +1,6 @@
 
 #include "cubic_b_spline.h"
+#include "open_cubic_b_spline.h"
 
 /********************************************************************
 	created:	 2009/07/23
@@ -30,8 +31,17 @@ public:
 	// maxIterNum: the maximum of iteration
 	// eplison:    the threshold of ending iteration
 	//////////////////////////////////////////////////////////////////////////
-	double apply( const vector<Vector2d>& points, 
-		CubicBSplineCurve& curve,
+	double fitAClosedCurve( const vector<Vector2d>& points, 
+		ClosedCubicBSplineCurve& curve,
+		int controlNum  = 28,
+		int maxIterNum = 30, 
+		double alpha  = 0.002,
+		double beta = 0.005,  // 0.005	     
+		double eplison = 0.0001);
+
+
+	double fitAOpenCurve( const vector<Vector2d>& points, 
+		OpenCubicBSplineCurve& curve,
 		int controlNum  = 28,
 		int maxIterNum = 30, 
 		double alpha  = 0.002,
@@ -40,7 +50,12 @@ public:
 
 private:
 	// initial control points
-	void initControlPoint( const vector<Vector2d>& points, 
+	void initClosedControlPoints( const vector<Vector2d>& points, 
+		vector<Vector2d>& controlPs,
+		int controlNum);
+
+
+	void initOpenControlPoints(const vector<Vector2d>& points, 
 		vector<Vector2d>& controlPs,
 		int controlNum);
 };

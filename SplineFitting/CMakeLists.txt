@@ -17,10 +17,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/core)
 
 set(incs    
 			core/cubic_b_spline.h
+			core/open_cubic_b_spline.h
 			core/spline_curve_fitting.h			
             )
 			
 set(srcs    core/cubic_b_spline.cpp
+			core/open_cubic_b_spline.cpp
             core/spline_curve_fitting.cpp
 			)
 			

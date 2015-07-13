@@ -23,23 +23,31 @@ using namespace Eigen;
 
 
 
-class ClosedCubicBSplineCurve 
+class OpenCubicBSplineCurve 
 {
 
 public:
 	typedef std::pair<int, double> Parameter;
 
-	ClosedCubicBSplineCurve( double interal = 0.001 )
+	OpenCubicBSplineCurve( double interal = 0.001 )
 		: interal_(interal)
 	{
 
 	}
 
-	~ClosedCubicBSplineCurve() { 
+	~OpenCubicBSplineCurve() { 
 		clear(); 
 	}
 
 	unsigned int nb_control()  const { return controls_.size(); }
+	//************************************
+	// Method:    nb_segment
+	// Returns:   unsigned int
+	// Function:  曲线由多少段组成
+	// Time:      2015/07/08
+	// Author:    Qian
+	//************************************
+	unsigned int nb_segment()  const { return controls_.size()-3; }  
 
 	//////////////////////////////////////////////////////////////////////////
 	// compute the x ,y position of current parameter
@@ -99,19 +107,15 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	bool checkSameSide( Vector2d p1,  Vector2d p2, Vector2d neip);
 
-
-
 	const vector<Vector2d>& getControls() const {return controls_;}
 	const vector<Vector2d>& getSamples() const { return positions_; }
 
 
-
 	MatrixXd getSIntegralSq( );
-
 	MatrixXd getFIntegralSq( );
 
 	void getDistance_sd( const Vector2d& point, const Parameter& para, MatrixXd& ehm, VectorXd& ehv );
-
+	void getDistance_pd( const Vector2d& point, const Parameter& para, MatrixXd& ehm, VectorXd& ehv );
 
 	//************************************
 	// Method:    local2GlobalIdx
@@ -121,11 +125,6 @@ public:
 	// Author:    Qian
 	//************************************
 	int local2GlobalIdx( int segId, int localIdx);
-
-
-
-
-
 
 private:
 	void clear()
