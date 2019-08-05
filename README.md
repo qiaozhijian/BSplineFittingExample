@@ -3,44 +3,12 @@ BSplineFitting
 
 Fitting cubic spline curve to 2d points
 
-## Introduction ##
-
-This is an implementation of paper "Fitting B-spline Curves to Point Clouds
-by Curvature-Based Squared Distance Minimization".
-
-Link to the paper: [http://www.geometrie.tuwien.ac.at/ig/sn/2006/wpl_curves_06/wpl_curves_06.html](http://www.geometrie.tuwien.ac.at/ig/sn/2006/wpl_curves_06/wpl_curves_06.html "link")
-
-The input is a set of 2d points, the output are control points of a close cubic spline curve.
-
-1. Input file: a file that contains n rows and each row reprents a point with x y positions.
-2. Output files: a file with the control points of the output curve; and a file with sampling points of the output file. 
-
-## Third-Party Dependencies ##
-
-This project depends on two code librarie:
-
-1. Eigen 3: all matrix and vector operations are based on this library
-2. ANN: it is used to compute the nearest neighbor of a given point.
-
-## Building and Running ##
-BSplineFitting should be able to run in any environment, but it is **only** tested in windows enviroment.
-
-I use cmake to configure and generate project files.
-
-## Main Files##
-drawResult.m: a simple .m file to visulize the input and output
-
-core/cubic_b_spline.h: a class encode the cubic b spline
-
-core/spline_curve_fitting.h: 
-
-read_write_asc.h: a simple class that reads/writes files
 
 
+This is an implementation of the paper
+["Fitting B-spline Curves to Point Clouds
+by Curvature-Based Squared Distance Minimization"](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/12/Fitting-B-spline-Curves-to-Point-Clouds-by-Curvature-Based-Squared-Distance-Minimization.pdf) by Wang et al.
 
+This fork puts the original repository into a catkin package and uses [libnabo](https://github.com/ethz-asl/libnabo) instead of [ANN](https://www.cs.umd.edu/~mount/ANN/).
 
-
-
-
-
-
+The package allows to fit open or closed B-spline curves through an unordered set of 2d points in contrast to the [curves package](https://github.com/ethz-asl/curves), which assumes points to be ordered in time.
