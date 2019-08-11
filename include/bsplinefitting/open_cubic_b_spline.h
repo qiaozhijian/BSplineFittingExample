@@ -12,8 +12,8 @@ class OpenCubicBSplineCurve
 public:
 	typedef std::pair<int, double> Parameter;
 
-	OpenCubicBSplineCurve( double interal = 0.001 )
-		: interal_(interal)
+	OpenCubicBSplineCurve( double interval = 0.001 )
+		: interval_(interval)
 	{
 
 	}
@@ -118,7 +118,7 @@ private:
 
 
 private:
-	double interal_;
+	double interval_;
 	std::vector<Eigen::Vector2d> controls_;
 	std::vector<Eigen::Vector2d> positions_;
 

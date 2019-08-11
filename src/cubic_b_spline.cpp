@@ -11,7 +11,7 @@ void ClosedCubicBSplineCurve::setNewControl(
 
 	for( unsigned int i = 0; i<nb_control(); i++)
 	{
-		for( double fj = 0; fj <=1.0f; fj+= interal_)
+		for( double fj = 0; fj <=1.0f; fj+= interval_)
 		{
 			Parameter temp(i,fj);
 			Eigen::Vector2d p = getPos( temp ) ;
@@ -210,7 +210,7 @@ ClosedCubicBSplineCurve::Parameter ClosedCubicBSplineCurve::getPara(
 {
 	int num = (int)( positions_.size()/controls_.size());
 	int ki = index/num;
-	double tf = interal_*( index - ki*num );
+	double tf = interval_*( index - ki*num );
 	return make_pair( ki, tf);
 }
 
@@ -258,7 +258,7 @@ bool ClosedCubicBSplineCurve::checkSameSide(Eigen::Vector2d p1,
 
 bool ClosedCubicBSplineCurve::checkInside(Eigen::Vector2d p)
 {
-	int strip = 0.02/interal_;
+	int strip = 0.02/interval_;
 	int    wn = 0;    // the winding number counter
 	// loop through all edges of the polygon
 	for (int i=0; i< (int)positions_.size(); i+=strip)
@@ -399,7 +399,7 @@ void ClosedCubicBSplineCurve::getDistance_sd( const Eigen::Vector2d& point,
 
 	Eigen::MatrixXd  tv(1,4);
 	tv << tf*tf*tf, tf*tf, tf, 1;
-	Eigen::MatrixXd rv = tv*cm/6.0;   //1*4
+	Eigen::MatrixXd rv = tv*cm/6.0;
 
 	Eigen::MatrixXd am(2,8);
 	am.setZero();

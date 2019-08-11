@@ -12,7 +12,7 @@ void OpenCubicBSplineCurve::setNewControl(
 
 	for( unsigned int i = 0; i<numSeg; i++)
 	{
-		for( double fj = 0; fj <=1.0f; fj+= interal_)
+		for( double fj = 0; fj <=1.0f; fj+= interval_)
 		{
 			Parameter temp(i,fj);
 			Eigen::Vector2d p = getPos( temp ) ;
@@ -175,7 +175,7 @@ double OpenCubicBSplineCurve::findFootPrint(
 
 	const unsigned kSearchOptionFlags =
       Nabo::NNSearchD::ALLOW_SELF_MATCH;
-  // static_cast<int>(map_curbstone_points_map_.size());
+
   Eigen::MatrixXi result_indices(kMaxNumNeighbors, 1);
   Eigen::MatrixXd distances(kMaxNumNeighbors, 1);
 
@@ -185,12 +185,6 @@ double OpenCubicBSplineCurve::findFootPrint(
 	for( int i = 0 ;i!= (int)givepoints.size(); ++i) {
 		queryPt[0] = givepoints[i].x();
 		queryPt[1] = givepoints[i].y();
-		// kdTree->annkSearch( // search
-		// 	queryPt, // query point
-		// 	iKNei, // number of near neighbors
-		// 	nnIdx, // nearest neighbors (returned)
-		// 	dists, // distance (returned)
-		// 	eps); // error bound
 
 	  spline_nabo->knn(
 	      queryPt, result_indices, distances, kMaxNumNeighbors,
@@ -207,7 +201,7 @@ OpenCubicBSplineCurve::Parameter OpenCubicBSplineCurve::getPara(
 {
 	int num = (int)( positions_.size()/ nb_segment() );
 	int ki = index/num;
-	double tf = interal_*( index - ki*num );
+	double tf = interval_*( index - ki*num );
 	return make_pair( ki, tf);
 }
 
@@ -253,7 +247,7 @@ bool OpenCubicBSplineCurve::checkSameSide(Eigen::Vector2d p1,
 
 bool OpenCubicBSplineCurve::checkInside(Eigen::Vector2d p)
 {
-	int strip = 0.02/interal_;
+	int strip = 0.02/interval_;
 	int    wn = 0;    // the winding number counter
 	// loop through all edges of the polygon
 	for (int i=0; i< (int)positions_.size(); i+=strip)
@@ -469,7 +463,7 @@ void OpenCubicBSplineCurve::getDistance_pd( const Eigen::Vector2d& point,
 
 	Eigen::MatrixXd  tv(1,4);
 	tv << tf*tf*tf, tf*tf, tf, 1;
-	Eigen::MatrixXd rv = tv*cm/6.0;   //1*4
+	Eigen::MatrixXd rv = tv*cm/6.0;   
 
 	Eigen::MatrixXd am(2,8);
 	am.setZero();
