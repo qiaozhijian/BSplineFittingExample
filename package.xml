@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>bsplinefitting</name>
-  <version>0.0.0</version>
+  <version>0.0.1</version>
   <description>Spline fitting package</description>
   <maintainer email="developers@sevensense.ch">Sevensense developers</maintainer>
   <license>closed</license>
