@@ -200,7 +200,9 @@ OpenCubicBSplineCurve::Parameter OpenCubicBSplineCurve::getPara(
 	 int index ) const
 {
 	int num = (int)( positions_.size()/ nb_segment() );
+    // ki is the index of the first control point
 	int ki = index/num;
+    // tf is the parameter of the point on the segment
 	double tf = interval_*( index - ki*num );
 	return make_pair( ki, tf);
 }
